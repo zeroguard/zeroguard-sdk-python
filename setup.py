@@ -3,6 +3,8 @@
 import os
 import setuptools
 
+import zeroguard
+
 
 PACKAGE_NAME = 'zeroguard'
 PARENT_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -14,49 +16,38 @@ REQUIREMENTS = []
 TEST_REQUIREMENTS = []
 
 
-def load_package_info():
-    """Load package information from corresponding files."""
-    about = {}
-    with open(ABOUT_FILE) as about_file:
-        # pylint: disable=W0122
-        exec(about_file.read(), about)
-
-    readme = None
+def main():
+    """Set up the package."""
     with open(README_FILE) as readme_file:
         readme = readme_file.read()
 
-    return about, readme
-
-
-def main():
-    """."""
-    about, readme = load_package_info()
-
     setuptools.setup(
-        name=about['__title__'],
-        version=about['__version__'],
-        license=about['__license__'],
+        name=zeroguard.__title__,
+        version=zeroguard.__version__,
+        license=zeroguard.__license__,
 
-        description=about['__description__'],
+        description=zeroguard.__description__,
         long_description=readme,
         long_description_content_type='text/markdown',
 
-        author=about['__author__'],
-        author_email=about['__author_email__'],
-        url=about['__docs_url__'],
+        author=zeroguard.__author__,
+        author_email=zeroguard.__author_email__,
+        url=zeroguard.__docs_url__,
 
         packages=[PACKAGE_NAME],
         package_data={'': ['CHANGELOG.md', 'LICENSE']},
 
-        python_requires='>=3.5',
+        python_requires='>=3.3',
         install_requires=REQUIREMENTS,
         tests_require=TEST_REQUIREMENTS,
 
         classifiers=[
             'Development Status :: 1 - Planning',
             'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
+            'License :: OSI Approved :: GNU Affero General Public License v3',
             'Natural Language :: English',
+            'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
@@ -66,8 +57,8 @@ def main():
         ],
 
         project_urls={
-            'Documentation': about['__docs_url__'],
-            'Source': about['__source_url__']
+            'Documentation': zeroguard.__docs_url__,
+            'Source': zeroguard.__source_url__
         }
     )
 

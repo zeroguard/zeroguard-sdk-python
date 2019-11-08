@@ -7,7 +7,7 @@ ENV_FILE=.env
 ###############################################################################
 # Configurable constants block
 ###############################################################################
-PACKAGE_NAME := zeroguard
+PACKAGE_NAME := zeroguard-sdk
 PIPENV_CMD_RUN := pipenv run
 
 SPHINX_SOURCE_DIR := ./docs

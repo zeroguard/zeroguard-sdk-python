@@ -1,2 +1,3 @@
-ZeroGuard Client
-================
+ZeroGuard Python SDK
+====================
+Coming soon
