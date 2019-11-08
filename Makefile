@@ -7,7 +7,7 @@ ENV_FILE=.env
 ###############################################################################
 # Configurable constants block
 ###############################################################################
-PACKAGE_NAME := zeroguard-sdk
+PACKAGE_NAME := zeroguard_sdk
 PIPENV_CMD_RUN := pipenv run
 
 SPHINX_SOURCE_DIR := ./docs
@@ -35,8 +35,8 @@ init:
 docs:
 	$(SPHINX_CMD_BUILD) $(SPHINX_SOURCE_DIR) $(SPHINX_BUILD_DIR)
 
-.PHONY: publish
-publish:
+.PHONY: pypi
+pypi:
 	$(PIPENV_CMD_RUN) python setup.py sdist bdist_wheel
 	$(PIPENV_CMD_RUN) twine upload dist/* || :
 	rm -rf build/ dist/ .egg $(PACKAGE_NAME).egg-info

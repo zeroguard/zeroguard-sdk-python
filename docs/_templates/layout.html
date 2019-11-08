@@ -1,0 +1,18 @@
+{% extends "!layout.html" %}
+{% block footer %}
+  <style>
+    .footer {
+      margin: 10px auto 0px auto !important;
+    }
+
+    .extra-footer {
+      margin: 0px auto 30px auto !important;
+    }
+  </style>
+
+  {{ super() }}
+
+  <div class="footer extra-footer">
+    <p>Made with love by <a href="https://zeroguard.com">ZeroGuard</a></p>
+  </div>
+{% endblock %}
