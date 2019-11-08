@@ -10,6 +10,10 @@ ENV_FILE=.env
 PACKAGE_NAME := zeroguard
 PIPENV_CMD_RUN := pipenv run
 
+SPHINX_SOURCE_DIR := ./docs
+SPHINX_BUILD_DIR := $(SPHINX_SOURCE_DIR)/_build
+SPHINX_CMD_BUILD := $(PIPENV_CMD_RUN) sphinx-build
+
 ###############################################################################
 # Inferred constants block
 ###############################################################################
@@ -27,8 +31,12 @@ init:
 	pip3 install pipenv --upgrade
 	pipenv install --dev
 
+.PHONY: docs
+docs:
+	$(SPHINX_CMD_BUILD) $(SPHINX_SOURCE_DIR) $(SPHINX_BUILD_DIR)
+
 .PHONY: publish
-publish: init
+publish:
 	$(PIPENV_CMD_RUN) python setup.py sdist bdist_wheel
 	$(PIPENV_CMD_RUN) twine upload dist/* || :
 	rm -rf build/ dist/ .egg $(PACKAGE_NAME).egg-info
