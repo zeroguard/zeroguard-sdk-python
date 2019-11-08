@@ -1,6 +1,6 @@
 ---
 # Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+# See docs: https://docs.readthedocs.io/en/stable/config-file/v2.html
 version: 2
 
 sphinx:

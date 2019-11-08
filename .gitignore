@@ -9,6 +9,7 @@
 *@neomake*
 
 # Python temporary files
+.coverage
 .egg
 *.pyc
 dist/

@@ -31,12 +31,16 @@ init:
 	pip3 install pipenv --upgrade
 	pipenv install --dev
 
+.PHONY: test
+test:
+	$(PIPENV_CMD_RUN) python3 -m pytest
+
 .PHONY: docs
 docs:
 	$(SPHINX_CMD_BUILD) $(SPHINX_SOURCE_DIR) $(SPHINX_BUILD_DIR)
 
 .PHONY: pypi
 pypi:
-	$(PIPENV_CMD_RUN) python setup.py sdist bdist_wheel
+	$(PIPENV_CMD_RUN) python3 setup.py sdist bdist_wheel
 	$(PIPENV_CMD_RUN) twine upload dist/* || :
 	rm -rf build/ dist/ .egg $(PACKAGE_NAME).egg-info

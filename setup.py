@@ -37,7 +37,7 @@ def main():
         packages=[PACKAGE_NAME],
         package_data={'': ['CHANGELOG.md', 'LICENSE']},
 
-        python_requires='>=3.3',
+        python_requires='>=3.4',
         install_requires=REQUIREMENTS,
         tests_require=TEST_REQUIREMENTS,
 
@@ -46,7 +46,6 @@ def main():
             'Intended Audience :: Developers',
             'License :: OSI Approved :: GNU Affero General Public License v3',
             'Natural Language :: English',
-            'Programming Language :: Python :: 3.3',
             'Programming Language :: Python :: 3.4',
             'Programming Language :: Python :: 3.5',
             'Programming Language :: Python :: 3.6',
