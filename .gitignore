@@ -1,0 +1,18 @@
+# Configuration and secrets
+.env*
+!.env.example
+
+# OS-specific temporary files
+.DS_Store
+
+# Other temporary files
+*@neomake*
+
+# Python temporary files
+.egg
+*.pyc
+dist/
+zeroguard.egg-info
+
+# Sphinx temporary files
+docs/_build
