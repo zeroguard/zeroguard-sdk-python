@@ -28,7 +28,7 @@ all:
 ###############################################################################
 .PHONY: init
 init:
-	pip3 install pipenv --upgrade
+	pip3 install pipenv 'twine>=1.5.0' --upgrade
 	pipenv install --dev
 
 .PHONY: test
@@ -41,6 +41,6 @@ docs:
 
 .PHONY: pypi
 pypi:
-	$(PIPENV_CMD_RUN) python3 setup.py sdist bdist_wheel
-	$(PIPENV_CMD_RUN) twine upload dist/* || :
+	python3 setup.py sdist bdist_wheel
+	twine upload dist/* || :
 	rm -rf build/ dist/ .egg $(PACKAGE_NAME).egg-info

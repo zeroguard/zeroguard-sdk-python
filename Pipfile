@@ -7,6 +7,5 @@ name = "pypi"
 pytest = "*"
 pytest-cov = "*"
 sphinx = "*"
-twine = "*"
 
 [packages]
