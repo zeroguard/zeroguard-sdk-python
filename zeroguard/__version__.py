@@ -2,7 +2,7 @@
 
 __title__ = 'zeroguard-sdk'
 __description__ = 'ZeroGuard Python SDK'
-__version__ = '0.0.1.dev1'
+__version__ = '0.0.1.dev2'
 
 __docs_url__ = 'https://zeroguard-sdk-python.readthedocs.io'
 __source_url__ = 'https://github.com/zeroguard/zeroguard-sdk-python'
