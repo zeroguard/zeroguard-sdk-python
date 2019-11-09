@@ -32,7 +32,7 @@ def main():
 
         author=zeroguard.__author__,
         author_email=zeroguard.__author_email__,
-        url=zeroguard.__docs_url__,
+        url=zeroguard.__home_url__,
 
         packages=[PACKAGE_NAME],
         package_data={'': ['CHANGELOG.md', 'LICENSE']},
