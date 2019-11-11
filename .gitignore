@@ -11,8 +11,10 @@
 # Python temporary files
 .coverage
 .egg
+.pipenv.md5
 *.pyc
 dist/
+pipenv/
 zeroguard.egg-info
 
 # Sphinx temporary files
