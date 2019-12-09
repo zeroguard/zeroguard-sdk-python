@@ -7,10 +7,10 @@ import zeroguard
 
 
 PACKAGE_NAME = 'zeroguard'
-PARENT_DIR = os.path.abspath(os.path.dirname(__file__))
-
-ABOUT_FILE = os.path.join(PARENT_DIR, PACKAGE_NAME, '__version__.py')
 README_FILE = 'README.md'
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+ABOUT_FILE = os.path.join(BASE_DIR, PACKAGE_NAME, '__version__.py')
 
 REQUIREMENTS = []
 TEST_REQUIREMENTS = []
@@ -37,7 +37,7 @@ def main():
         packages=[PACKAGE_NAME],
         package_data={'': ['CHANGELOG.md', 'LICENSE']},
 
-        python_requires='>=3.4',
+        python_requires='>=3.5',
         install_requires=REQUIREMENTS,
         tests_require=TEST_REQUIREMENTS,
 
