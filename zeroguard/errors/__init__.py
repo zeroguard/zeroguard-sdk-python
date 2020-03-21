@@ -1,0 +1,1 @@
+"""Zeroguard SDK errors package."""
