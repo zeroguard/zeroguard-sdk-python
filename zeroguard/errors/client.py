@@ -17,4 +17,7 @@ class ZGSanityCheckFailed(ZGClientError):
     """."""
 
     NAME = 'sanity_check_failed'
-    DESC = "Sanity check failed. This most probably indicates that it's a bug."
+    DESC = (
+        'Sanity check failed. This is most probably a bug or a bad attempt '
+        'at monkey patching.'
+    )

@@ -1,4 +1,5 @@
 """Logging and formatting utility functions."""
+import logging
 import traceback
 
 ESCAPE_TRANSLATION_TABLE = {
@@ -75,3 +76,10 @@ def format_logmsg(*msg, fields=None, error=None, trace=True):
         )
 
     return msg
+
+
+def get_labeled_logger(name, label):
+    """."""
+    label = '[%s]' % label if label else ''
+    name = '%s%s' % (name, label)
+    return logging.getLogger(name)

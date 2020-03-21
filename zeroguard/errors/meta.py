@@ -1,10 +1,10 @@
-"""Abstract error classes."""
+"""Abstract error base classes."""
 from abc import ABC
 
 from zeroguard.utils.log import check_printable, format_logmsg
 
 
-class ZGErrorMeta(ABC):
+class ZGErrorMeta(Exception, ABC):
     """Base abstract class for ZeroGuard SDK errors."""
 
     NAME = None
@@ -12,10 +12,13 @@ class ZGErrorMeta(ABC):
 
     def __init__(self, context=None, desc=None, message=None, name=None):
         """."""
+        self._name = name
+        self._desc = desc
+
         self.context = context
-        self.desc = desc
         self.message = message
-        self.name = name
+
+        super().__init__(self.message)
 
     def __str__(self, as_tuple=False):
         """."""
@@ -38,12 +41,12 @@ class ZGErrorMeta(ABC):
     @property
     def name(self):
         """Return name of this error."""
-        return self.name if self.name else self.NAME
+        return self._name if self._name else self.NAME
 
     @property
     def desc(self):
         """Return description of this error."""
-        return self.desc if self.desc else self.DESC
+        return self._desc if self._desc else self.DESC
 
 
 class ZGClientErrorMeta(ZGErrorMeta, ABC):
