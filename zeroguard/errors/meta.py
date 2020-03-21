@@ -57,8 +57,8 @@ class ZGClientErrorMeta(ZGErrorMeta, ABC):
 
     def __init__(self, error=None, **kwargs):
         """."""
-        super().__init__(**kwargs)
         self.error = error
+        super().__init__(**kwargs)
 
     def __str__(self, with_error=False, with_trace=False):
         """."""
@@ -81,10 +81,9 @@ class ZGServerErrorMeta(ZGErrorMeta, ABC):
 
     def __init__(self, status_code, query=None, **kwargs):
         """."""
-        super().__init__(**kwargs)
-
         self.status_code = status_code
         self.query = query
+        super().__init__(**kwargs)
 
     def __str__(self, with_query=True):
         """."""

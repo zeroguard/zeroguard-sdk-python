@@ -24,7 +24,10 @@ class ReferencerMeta(ABC):
 
     @abstractmethod
     def __getitem__(self, ref):
-        """Get a referenced object using its reference ID."""
+        """Get a referenced object using its reference ID.
+
+        :raises: KeyError
+        """
         raise ZGSanityCheckFailed(
             message='Referencer does not implement __getitem__ method',
             context={'referencer_class': self.__class__.__name__}
@@ -85,7 +88,10 @@ class DictReferencer(ReferencerMeta):
         ))
 
     def __getitem__(self, ref):
-        """Get a referenced object using its reference ID."""
+        """Get a referenced object using its reference ID.
+
+        :raises: KeyError
+        """
         try:
             return self._refs[ref]
 
