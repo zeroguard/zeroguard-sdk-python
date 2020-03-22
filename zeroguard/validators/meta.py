@@ -41,3 +41,41 @@ def cast_value(value, *cast_functions):
         ))
 
     return casted_value
+
+
+def validate(value, validators, convert=True, expected_type=None):
+    """."""
+    verb_expected_type = str(expected_type) if expected_type else 'not_spec'
+
+    try:
+        result = cast_value(value, *validators)
+
+    # Failed to cast which means that check has failed as well
+    except RuntimeError as err:
+        if convert:
+            raise ValueError(format_logmsg(
+                'Failed to convert a value to a native type',
+                error=err,
+                fields={
+                    'value': value,
+                    'expected_type': verb_expected_type
+                }
+            ))
+
+        return False
+
+    # Check whether conversion end up with an expected type
+    if expected_type:
+        if expected_type == type(result):
+            return result
+
+        raise ValueError(format_logmsg(
+            'Convertion yielded a type different from the one requested',
+            fields={
+                'value': value,
+                'expected_type': verb_expected_type,
+                'got_type': type(result)
+            }
+        ))
+
+    return result if convert else True
