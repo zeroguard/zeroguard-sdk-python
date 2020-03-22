@@ -27,6 +27,7 @@ class ZGErrorMeta(Exception, ABC):
             ': %s' % self.message if self.message else ''
         )
 
+        message = message.replace('.:', ':')
         fields = {'error_name': self.name}
 
         # Determine whether context can be printed
@@ -70,7 +71,7 @@ class ZGClientErrorMeta(ZGErrorMeta, ABC):
                 trace=with_trace
             )
 
-        return format_logmsg(message, fields)
+        return format_logmsg(message, fields=fields)
 
 
 class ZGServerErrorMeta(ZGErrorMeta, ABC):
@@ -93,4 +94,4 @@ class ZGServerErrorMeta(ZGErrorMeta, ABC):
         if self.query and with_query:
             fields['resolved_query_params'] = format_logmsg(fields=self.query)
 
-        return format_logmsg(message, fields)
+        return format_logmsg(message, fields=fields)

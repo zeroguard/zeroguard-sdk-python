@@ -23,7 +23,7 @@ class ReferencerMeta(ABC):
         )
 
     @abstractmethod
-    def __getitem__(self, ref):
+    def __getitem__(self, ref, log=True):
         """Get a referenced object using its reference ID.
 
         :raises: KeyError
@@ -57,6 +57,14 @@ class ReferencerMeta(ABC):
             context={'referencer_class': self.__class__.__name__}
         )
 
+    @abstractmethod
+    def items(self):
+        """Return a list of tuples of all ref-object pairs."""
+        raise ZGSanityCheckFailed(
+            message='Referencer does not implement items method',
+            context={'referencer_class': self.__class__.__name__}
+        )
+
 
 class DictReferencer(ReferencerMeta):
     """A simple implementation of a referencer that is essentially a dict.
@@ -87,7 +95,7 @@ class DictReferencer(ReferencerMeta):
             fields={'ref_id': ref}
         ))
 
-    def __getitem__(self, ref):
+    def __getitem__(self, ref, log=True):
         """Get a referenced object using its reference ID.
 
         :raises: KeyError
@@ -96,10 +104,11 @@ class DictReferencer(ReferencerMeta):
             return self._refs[ref]
 
         except KeyError as err:
-            self.logger.debug(format_logmsg(
-                'Failed to retrieve object reference as it was not found',
-                fields={'ref_id': ref}
-            ))
+            if log:
+                self.logger.debug(format_logmsg(
+                    'Failed to retrieve object reference as it was not found',
+                    fields={'ref_id': ref}
+                ))
 
             raise err
 
@@ -116,11 +125,20 @@ class DictReferencer(ReferencerMeta):
 
         :raises: zeroguard.errors.client.ZGSanityCheckFailed
         """
+        if not isinstance(ref, int):
+            raise ZGSanityCheckFailed(
+                message='Reference ID must be a number',
+                context={
+                    'reference_id_type': type(ref),
+                    'reference_id': ref
+                }
+            )
+
         try:
-            existing_instance = self.__getitem__(ref)
+            existing_instance = self.__getitem__(ref, log=False)
 
             raise ZGSanityCheckFailed(
-                'Referenced object with such ID already exists',
+                message='Referenced object with such ID already exists',
                 context={
                     'ref_id': ref,
                     'existing_instance': existing_instance,
@@ -142,3 +160,7 @@ class DictReferencer(ReferencerMeta):
 
         # This is a new reference that can be set
         self._refs[ref] = instance
+
+    def items(self):
+        """Return a list of tuples of all ref-object pairs."""
+        return self._refs.items()

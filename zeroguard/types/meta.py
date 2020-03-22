@@ -1,8 +1,8 @@
 """Abstract data base classes."""
 from abc import ABC, abstractmethod
+import inspect
 
 from zeroguard.errors.client import ZGClientError, ZGSanityCheckFailed
-from zeroguard.referencer import ReferencerMeta
 from zeroguard.utils.log import format_logmsg, get_labeled_logger
 
 
@@ -10,31 +10,25 @@ class DataTypeMeta(ABC):
     """."""
 
     TYPE = None
-    DEREF_BLACKLIST = [
-        'logger',
-        '_referencer',
-        '_deref_map'
-    ]
 
     def __init__(self, logger_label=None, referencer=None):
         """."""
-        self.logger = get_labeled_logger(__name__, logger_label)
+        self._logger = get_labeled_logger(__name__, logger_label)
         self._referencer = referencer
         self._deref_map = {}
 
-        # Data validation
-        if not isinstance(self._referencer, ReferencerMeta):
-            raise ZGSanityCheckFailed(
-                message='Referencer does not implement Referencer interface',
-                context={'referencer_type': type(self._referencer)}
-            )
-
     def __getattribute__(self, name):
         """."""
+        value = object.__getattribute__(self, name)
+
+        # Bypass if getting an instance method or an internal attribute
+        if name.startswith('_') or inspect.ismethod(value):
+            return value
+
         # Attribute was already dereferenced
         try:
             if self._deref_map[name]:
-                return object.__getattribute__(self, name)
+                return value
 
         except KeyError:
             pass
@@ -43,7 +37,7 @@ class DataTypeMeta(ABC):
         self.dereference(name)
 
         # Return already dereferenced attribute
-        return object.__getattribute__(self, name)
+        return value
 
     @abstractmethod
     def __str__(self):
@@ -63,14 +57,6 @@ class DataTypeMeta(ABC):
             )
 
         return self.TYPE
-
-    def dereference_all(self):
-        """."""
-        for attr in dir(self):
-            if attr in self.DEREF_BLACKLIST:
-                continue
-
-            self.dereference(attr)
 
     def dereference(self, attribute_name):
         """."""
@@ -154,8 +140,8 @@ class DataTypeMeta(ABC):
             context={'data_type_class': self.__class__.__name__}
         )
 
-    @abstractmethod
     @classmethod
+    @abstractmethod
     def from_dict(cls, data, referencer):
         """Return a new instance of this data type loaded from a dictionary.
 
@@ -163,8 +149,8 @@ class DataTypeMeta(ABC):
         :param refs_lookup: Instance or a referencer implementation that allows
                             to query and submit referenced objects.
 
-        :type data:        dict
-        :type refs_lookup: zeroguard.referencer.ReferencerMeta child
+        :type data:       dict
+        :type referencer: zeroguard.referencer.ReferencerMeta child
         """
         raise ZGSanityCheckFailed(
             message='Data type does not implement from_dict method',

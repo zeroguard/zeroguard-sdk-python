@@ -64,12 +64,6 @@ def format_logmsg(*msg, fields=None, error=None, trace=True):
             ))
 
     if fields:
-        # Some error classes may contain descriptions which are several
-        # sentences long and thus end with a period. We remove the period
-        # because the message will contain a semicolor before a fields list
-        # start.
-        msg = msg.strip('.')
-
         return '%s%s' % (
             '%s: ' % msg if msg else '',
             ', '.join(fields)
@@ -78,8 +72,17 @@ def format_logmsg(*msg, fields=None, error=None, trace=True):
     return msg
 
 
-def get_labeled_logger(name, label):
-    """."""
+def get_labeled_logger(name, label=None):
+    """.
+
+    :raises: TypeError
+    """
+    if not isinstance(name, (str, int, float)):
+        raise TypeError('Logger name must be a string or number')
+
+    if not isinstance(label, (str, int, float, type(None))):
+        raise TypeError('Logger label must be a string, number or None')
+
     label = '[%s]' % label if label else ''
     name = '%s%s' % (name, label)
     return logging.getLogger(name)
