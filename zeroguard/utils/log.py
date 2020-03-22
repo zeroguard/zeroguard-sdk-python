@@ -66,8 +66,8 @@ def format_logmsg(*msg, fields=None, error=None, trace=True):
     if fields:
         # Some error classes may contain descriptions which are several
         # sentences long and thus end with a period. We remove the period
-        # because the message will contain a semicolor before fields list
-        # starts.
+        # because the message will contain a semicolor before a fields list
+        # start.
         msg = msg.strip('.')
 
         return '%s%s' % (

@@ -70,13 +70,16 @@ class DataTypeMeta(ABC):
             if attr in self.DEREF_BLACKLIST:
                 continue
 
-            # TODO: Complain if failed to dereference
             self.dereference(attr)
 
     def dereference(self, attribute_name):
         """."""
-        attr_value = object.__getattribute__(self, attribute_name)
-        new_attr_value, derefed = self._dereference(attr_value)
+        attribute_value = self._dereference(
+            object.__getattribute__(self, attribute_name)
+        )
+
+        self._deref_map[attribute_name] = True
+        setattr(self, attribute_name, attribute_value)
 
     def _dereference(self, value):
         """.
@@ -99,7 +102,7 @@ class DataTypeMeta(ABC):
                     # Update a referenced object with meta information
                     # contained in a reference (if any).
                     referenced_object.update_from_fields(value.fields)
-                    return referenced_object, True
+                    return referenced_object
 
                 except (AttributeError, TypeError) as err:
                     raise ZGClientError(
@@ -115,34 +118,33 @@ class DataTypeMeta(ABC):
                     )
 
             # Failed to derefence as referencer does not contain a matching
-            # reference ID. Caller should react to this failure potentially
-            # raising an error.
-            except KeyError:
-                self.logger.warning(format_logmsg(
-                    'Failed to find a referenced object during dereferencing',
+            # reference ID
+            except KeyError as err:
+                raise ZGClientError(
+                    error=err,
+                    message=(
+                        'Failed to find a referenced object during '
+                        'dereferencing'
+                    ),
                     fields={
                         'reference_id': value.ref_id,
                         'reference': value
                     }
-                ))
-
-                return value, False
+                )
 
         # Value is a list which may contain references thus it should be
         # dereferenced recursively
         elif isinstance(value, list):
-            # FIXME
-            pass
+            return [self._dereference(v) for v in value]
 
         # Value is a dictionary which may contain references thus it should be
         # dereferenced recursively
         elif isinstance(value, dict):
-            # FIXME
-            pass
+            return {k: self._dereference(v) for k, v in value}
 
         # Value is a nested data type instance which will be lazily derefernced
         # as soon as accessed or other non-reference value.
-        return value, True
+        return value
 
     @abstractmethod
     def update_from_fields(self, fields):
