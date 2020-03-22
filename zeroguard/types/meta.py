@@ -10,14 +10,17 @@ class DataTypeMeta(ABC):
     """."""
 
     TYPE = None
+    DEREF_BLACKLIST = [
+        'logger',
+        '_referencer',
+        '_deref_map'
+    ]
 
-    def __init__(self, lazy=False, logger_label=None, referencer=None):
+    def __init__(self, logger_label=None, referencer=None):
         """."""
-        self._referencer = referencer
-        self._fields = {}
-
-        self.lazy = lazy
         self.logger = get_labeled_logger(__name__, logger_label)
+        self._referencer = referencer
+        self._deref_map = {}
 
         # Data validation
         if not isinstance(self._referencer, ReferencerMeta):
@@ -26,16 +29,21 @@ class DataTypeMeta(ABC):
                 context={'referencer_type': type(self._referencer)}
             )
 
-        # NOTE: Due to the fact that use can request immediate dereferencing of
-        # all fields, all children classes of this class must call
-        # super()__init__() as the last step of their own __init__() method.
-        if not self.lazy:
-            self.dereference_all()
-
-    def __getattr__(self, attr):
+    def __getattribute__(self, name):
         """."""
-        # TODO: Check in _fields, if exists - dereference and return a newly
-        # injected instance attribute.
+        # Attribute was already dereferenced
+        try:
+            if self._deref_map[name]:
+                return object.__getattribute__(self, name)
+
+        except KeyError:
+            pass
+
+        # This will raise if dereferencing failed
+        self.dereference(name)
+
+        # Return already dereferenced attribute
+        return object.__getattribute__(self, name)
 
     @abstractmethod
     def __str__(self):
@@ -58,48 +66,83 @@ class DataTypeMeta(ABC):
 
     def dereference_all(self):
         """."""
-        for field, value in self._fields.values():
-            pass
-            # TODO: Check whether a value contains DataReference object
-            # instances. If it does - dereference. Otherwise inject as is.
+        for attr in dir(self):
+            if attr in self.DEREF_BLACKLIST:
+                continue
 
-    def dereference(self, reference, attribute_name):
+            # TODO: Complain if failed to dereference
+            self.dereference(attr)
+
+    def dereference(self, attribute_name):
+        """."""
+        attr_value = object.__getattribute__(self, attribute_name)
+        new_attr_value, derefed = self._dereference(attr_value)
+
+    def _dereference(self, value):
         """.
 
-        :return: Flag that indicates whether a dereferencing operation was
-                 performed successfully.
-
-        :rtype:  bool
-
-        :raises: zeroguard.erors.client.ZGSanityCheckFailed
+        :raises zeroguard.errors.client.ZGClientError
         """
-        if not isinstance(reference, DataReference):
-            raise ZGSanityCheckFailed(
-                message='Reference is not an instance of DataReference object',
-                context={'reference_type': type(reference)}
-            )
-
-        try:
-            referenced_object = self._referencer[reference.ref_id]
+        # Value is a data reference that can be resolved directly
+        if isinstance(value, DataReference):
+            self.logger.debug(format_logmsg(
+                'Attempting to dereference a value',
+                fields={'reference': value}
+            ))
 
             try:
-                referenced_object.update_from_fields(reference.fields)
+                # Attempt to get a referenced object from a referencer by its
+                # reference ID. This might fail.
+                referenced_object = self._referencer[value.ref_id]
 
-            except (AttributeError, TypeError) as err:
-                raise ZGClientError(
-                    message='Failed to update a referenced object',
-                    error=err,
-                    context={
-                        'reference': reference,
-                        'referenced_object': referenced_object
+                try:
+                    # Update a referenced object with meta information
+                    # contained in a reference (if any).
+                    referenced_object.update_from_fields(value.fields)
+                    return referenced_object, True
+
+                except (AttributeError, TypeError) as err:
+                    raise ZGClientError(
+                        error=err,
+                        message=(
+                            'Failed to update a referenced object during '
+                            'dereferencing'
+                        ),
+                        context={
+                            'reference': value,
+                            'referenced_object': referenced_object
+                        }
+                    )
+
+            # Failed to derefence as referencer does not contain a matching
+            # reference ID. Caller should react to this failure potentially
+            # raising an error.
+            except KeyError:
+                self.logger.warning(format_logmsg(
+                    'Failed to find a referenced object during dereferencing',
+                    fields={
+                        'reference_id': value.ref_id,
+                        'reference': value
                     }
-                )
+                ))
 
-        except KeyError:
-            return False
+                return value, False
 
-        setattr(self, attribute_name, referenced_object)
-        return True
+        # Value is a list which may contain references thus it should be
+        # dereferenced recursively
+        elif isinstance(value, list):
+            # FIXME
+            pass
+
+        # Value is a dictionary which may contain references thus it should be
+        # dereferenced recursively
+        elif isinstance(value, dict):
+            # FIXME
+            pass
+
+        # Value is a nested data type instance which will be lazily derefernced
+        # as soon as accessed or other non-reference value.
+        return value, True
 
     @abstractmethod
     def update_from_fields(self, fields):
