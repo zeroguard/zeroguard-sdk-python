@@ -17,10 +17,6 @@ class ReferencerMeta(ABC):
     @abstractmethod
     def __delitem__(self, ref):
         """Delete a referenced object using its reference ID."""
-        raise ZGSanityCheckFailed(
-            message='Referencer does not implement __delitem__ method',
-            context={'referencer_class': self.__class__.__name__}
-        )
 
     @abstractmethod
     def __getitem__(self, ref, log=True):
@@ -28,42 +24,22 @@ class ReferencerMeta(ABC):
 
         :raises: KeyError
         """
-        raise ZGSanityCheckFailed(
-            message='Referencer does not implement __getitem__ method',
-            context={'referencer_class': self.__class__.__name__}
-        )
 
     @abstractmethod
     def __iter__(self):
         """Return iterator over all stored reference IDs."""
-        raise ZGSanityCheckFailed(
-            message='Referencer does not implement __iter__ method',
-            context={'referencer_class': self.__class__.__name__}
-        )
 
     @abstractmethod
     def __len__(self):
         """Return a total number of currently referenced objects."""
-        raise ZGSanityCheckFailed(
-            message='Referencer does not implement __len__ method',
-            context={'referencer_class': self.__class__.__name__}
-        )
 
     @abstractmethod
     def __setitem__(self, ref, instance):
         """Set a referenced object using its reference ID."""
-        raise ZGSanityCheckFailed(
-            message='Referencer does not implement __setitem__ method',
-            context={'referencer_class': self.__class__.__name__}
-        )
 
     @abstractmethod
     def items(self):
         """Return a list of tuples of all ref-object pairs."""
-        raise ZGSanityCheckFailed(
-            message='Referencer does not implement items method',
-            context={'referencer_class': self.__class__.__name__}
-        )
 
 
 class DictReferencer(ReferencerMeta):
