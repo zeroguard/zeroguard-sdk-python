@@ -137,9 +137,9 @@ class DataTypeMeta(ABC):
     def from_dict(cls, data, referencer):
         """Return a new instance of this data type loaded from a dictionary.
 
-        :param data:        Data dictionary from which to create an instance.
-        :param refs_lookup: Instance or a referencer implementation that allows
-                            to query and submit referenced objects.
+        :param data:       Data dictionary from which to create an instance.
+        :param referencer: Instance or a referencer implementation that allows
+                           to query and submit referenced objects.
 
         :type data:       dict
         :type referencer: zeroguard.referencer.ReferencerMeta child

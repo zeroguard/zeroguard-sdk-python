@@ -74,6 +74,11 @@ init:
 test:
 	$(PIPENV_CMD_RUN) python3 -m pytest
 
+.PHONY: testmark
+testmark:
+	@echo '---(i) INFO: Running all tests marked with @pytest.mark.testit'
+	$(PIPENV_CMD_RUN) python3 -m pytest -m testit
+
 .PHONY: docs
 docs:
 	$(SPHINX_CMD_BUILD) $(SPHINX_SOURCE_DIR) $(SPHINX_BUILD_DIR)
