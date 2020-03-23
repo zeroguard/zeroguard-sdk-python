@@ -4,7 +4,49 @@ from ipaddress import IPv4Network, IPv6Network
 import pytest
 
 # pylint: disable=E0401
-from zeroguard.types import NetworkPrefix
+from zeroguard.errors.client import ZGClientError
+from zeroguard.types import IPv4Address, NetworkPrefix
+
+
+@pytest.mark.testit
+@pytest.mark.parametrize('data', [
+    {
+        "type": "ipv4",
+        "address": "8.8.8.8",
+        "closest_prefix": {"_ref": 1},
+        "prefixes": [
+            {"_ref": 1},
+            {"_ref": 2},
+        ],
+        "reputation": [
+            {
+                "name": "firehol-coinbl-hosts",
+                "current": False,
+                "first_seen": 1584712048,
+                "last_seen": 1584720037
+
+            },
+            {
+                "name": "firehol-dshield-top-1000",
+                "current": True,
+                "first_seen": 1584714021,
+                "last_seen": 1584720037
+            }
+        ]
+    }
+])
+def test_ipv4_address_init_ok(data):
+    """Test zeroguard.types.ip_address.IPv4Address type."""
+    referencer = {}
+    ipaddr = IPv4Address.from_dict(data, referencer)
+
+    # This should raise because referencer does not contain any references
+    with pytest.raises(ZGClientError):
+        print(ipaddr.closest_prefix)
+
+    # Now when the reference is in place it should work fine
+    referencer[1] = NetworkPrefix('0.0.0.0/0')
+    print(ipaddr.closest_prefix)
 
 
 @pytest.mark.parametrize('data', [

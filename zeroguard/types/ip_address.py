@@ -2,7 +2,6 @@
 import ipaddress
 
 from zeroguard.types.meta import DataTypeMeta, DataReference
-from zeroguard.types import NetworkPrefix
 from zeroguard.utils.log import format_logmsg
 from zeroguard.validators.networks import check_valid_ip_address
 from zeroguard.validators.time import check_valid_unix_time
@@ -18,23 +17,16 @@ class IPReputationEntry:
         self.first_seen = check_valid_unix_time(first_seen)
         self.last_seen = check_valid_unix_time(last_seen)
 
-        if not isinstance(self.name, str):
-            raise ValueError(format_logmsg(
-                'IP reputation name must be string',
-                fields={
-                    'name_type': type(self.name),
-                    'name': name
-                }
-            ))
-
-        if not isinstance(self.current, bool):
-            raise ValueError(format_logmsg(
-                'IP reputation current fields must be bool',
-                fields={
-                    'current_field_type': type(self.current),
-                    'current_field': self.current
-                }
-            ))
+    def __str__(self):
+        """."""
+        return '\n'.join([
+            '%s(' % self.__class__.__name__,
+            '  name=%s' % self.name,
+            '  current=%s' % self.current,
+            '  first_seen=%s' % self.first_seen,
+            '  last_seen=%s' % self.last_seen,
+            ')'
+        ])
 
     @classmethod
     def from_dict(cls, data):
@@ -81,27 +73,94 @@ class IPv4Address(DataTypeMeta):
         self.prefixes = prefixes
         self.reputation = reputation
 
-        if not isinstance(closest_prefix, (DataReference, DataTypeMeta)):
-            raise ValueError(format_logmsg(
-                'Bad closest prefix field type',
-                fields={
-                    'closest_prefix_type': type(closest_prefix),
-                    'closest_prefix': closest_prefix
-                }
-            ))
-
-        # TODO: Paranoid checks of types of all other fields
-
         super().__init__(**kwargs)
 
     def __str__(self):
         """."""
-        # TODO: Implement
-        raise NotImplementedError()
+        data = [
+            '%s(' % self.__class__.__name__,
+            '  address=%s' % self.address,
+            '  closest_prefix=%s' % str(self.closest_prefix).rjust(4),
+            '  prefixes=[',
+        ]
+
+        for prefix in self.prefixes:
+            data.append(str(prefix).rjust(6))
+
+        data += [
+            '  ]',
+            '  reputation=['
+        ]
+
+        for repentry in self.reputation:
+            data.append(str(repentry).rjust(6))
+
+        data += [
+            '  ]',
+            ')'
+        ]
+
+        return '\n'.join(data)
 
     def update_from_reference_fields(self, reference, derefed_value):
-        """."""
+        """Do nothing when this callback is executed.
+
+        IPv4Address may contain references to network prefix objects but there
+        are not extra fields expected in the reference objects.
+        """
 
     @classmethod
     def from_dict(cls, data, referencer):
         """."""
+        errmsg = (
+            'Failed to create an IPv4 instance from a supplied data dictionary'
+        )
+
+        try:
+            data_type = data['type']
+            address = data['address']
+
+            # Create instances of IP reputation entries
+            reputation = [
+                IPReputationEntry.from_dict(d)
+                for d in data['reputation']
+            ]
+
+            closest_prefix_ref = data['closest_prefix']['_ref']
+            prefixes_refs = [p['_ref'] for p in data['prefixes']]
+
+            if data_type != IPv4Address.TYPE:
+                raise ValueError(format_logmsg(
+                    errmsg,
+                    error=Exception('Wrong data type in data'),
+                    fields={'data': data}
+                ))
+
+        except (KeyError, TypeError, ValueError) as err:
+            raise ValueError(format_logmsg(
+                errmsg,
+                error=err,
+                fields={'data': data}
+            ))
+
+        # Attempt to resolve references in place
+        try:
+            closest_prefix = referencer[closest_prefix_ref]
+        except KeyError:
+            closest_prefix = DataReference(closest_prefix_ref)
+
+        prefixes = []
+        for prefixes_ref in prefixes_refs:
+            try:
+                prefixes.append(referencer[prefixes_ref])
+            except KeyError:
+                prefixes.append(DataReference(prefixes_ref))
+
+        # Create a new instance of IPv4 address data type
+        return IPv4Address(
+            address,
+            closest_prefix,
+            prefixes,
+            reputation,
+            referencer=referencer
+        )

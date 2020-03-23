@@ -31,8 +31,9 @@ class ZGErrorMeta(Exception, ABC):
         fields = {'error_name': self.name}
 
         # Determine whether context can be printed
-        if check_printable(self.context):
-            fields['error_context'] = self.context
+        # FIXME: Disabled the check for a time being
+        #if check_printable(self.context):
+        fields['error_context'] = self.context
 
         return message, fields if as_tuple else format_logmsg(
             message,

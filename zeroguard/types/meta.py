@@ -37,7 +37,7 @@ class DataTypeMeta(ABC):
         self.dereference(name)
 
         # Return an attribute that was just dereferenced
-        return value
+        return object.__getattribute__(self, name)
 
     @abstractmethod
     def __str__(self):
@@ -70,7 +70,7 @@ class DataTypeMeta(ABC):
         """
         # Value is a data reference that can be resolved directly
         if isinstance(value, DataReference):
-            self.logger.debug(format_logmsg(
+            self._logger.debug(format_logmsg(
                 'Attempting to dereference a value',
                 fields={'reference': value}
             ))
@@ -89,11 +89,11 @@ class DataTypeMeta(ABC):
                     self.update_from_reference_fields(value, referenced_object)
                     return referenced_object
 
-                except (AttributeError, TypeError) as err:
+                except ZGClientError as err:
                     raise ZGClientError(
                         error=err,
                         message=(
-                            'Failed to update a referenced object during '
+                            'Failed to execute update callback during '
                             'dereferencing'
                         ),
                         context={
@@ -111,7 +111,7 @@ class DataTypeMeta(ABC):
                         'Failed to find a referenced object during '
                         'dereferencing'
                     ),
-                    fields={
+                    context={
                         'reference_id': value.ref_id,
                         'reference': value
                     }
@@ -161,7 +161,7 @@ class DataReference:
         self.fields = fields if fields else {}
 
         # Basic data validation
-        if not isinstance(ref_id, int):
+        if not isinstance(self.ref_id, int):
             raise ZGSanityCheckFailed(
                 message='Reference ID is not an integer',
                 context={
@@ -170,7 +170,7 @@ class DataReference:
                 }
             )
 
-        if not isinstance(fields, dict):
+        if not isinstance(self.fields, dict):
             raise ZGSanityCheckFailed(
                 message='Fields is not a dictionary',
                 context={
