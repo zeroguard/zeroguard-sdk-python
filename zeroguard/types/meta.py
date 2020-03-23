@@ -36,7 +36,7 @@ class DataTypeMeta(ABC):
         # This will raise if dereferencing failed
         self.dereference(name)
 
-        # Return already dereferenced attribute
+        # Return an attribute that was just dereferenced
         return value
 
     @abstractmethod
@@ -81,9 +81,12 @@ class DataTypeMeta(ABC):
                 referenced_object = self._referencer[value.ref_id]
 
                 try:
-                    # Update a referenced object with meta information
-                    # contained in a reference (if any).
-                    referenced_object.update_from_fields(value.fields)
+                    # Execute a callback that allows a data type to handle any
+                    # extra fields that were present in a reference. This may
+                    # include any kind of calculations (i.e. subdomain type
+                    # would mark the lastest or oldest known IPv4 address to
+                    # which this subdomain was pointing to).
+                    self.update_from_reference_fields(value, referenced_object)
                     return referenced_object
 
                 except (AttributeError, TypeError) as err:
@@ -129,8 +132,11 @@ class DataTypeMeta(ABC):
         return value
 
     @abstractmethod
-    def update_from_fields(self, fields):
-        """."""
+    def update_from_reference_fields(self, reference, derefed_value):
+        """.
+
+        :raises: zeroguard.errors.client.ZGClientError child
+        """
 
     @classmethod
     @abstractmethod

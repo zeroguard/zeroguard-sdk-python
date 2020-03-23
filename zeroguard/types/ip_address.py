@@ -99,12 +99,8 @@ class IPv4Address(DataTypeMeta):
         # TODO: Implement
         raise NotImplementedError()
 
-    def update_from_fields(self, fields):
+    def update_from_reference_fields(self, reference, derefed_value):
         """."""
-        # FIXME: We need a different way of storing fields that are supplied
-        # with a reference object as for a single given IP we may have multiple
-        # subdomains pointing to it at different points in time thus having
-        # different meta fields.
 
     @classmethod
     def from_dict(cls, data, referencer):

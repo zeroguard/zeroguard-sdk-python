@@ -27,9 +27,8 @@ class MockDataType(DataTypeMeta):
         """Mock."""
         return 'Mock data type instance: %s' % self.mock_id
 
-    def update_from_fields(self, _):
+    def update_from_reference_fields(self, reference, derefed_value):
         """Mock."""
-        return self
 
     @classmethod
     def from_dict(cls, _):

@@ -1,5 +1,4 @@
 """Network prefix data type."""
-from zeroguard.errors.client import ZGSanityCheckFailed
 from zeroguard.types.meta import DataTypeMeta
 from zeroguard.validators.networks import check_valid_network_prefix
 from zeroguard.utils.log import format_logmsg
@@ -19,15 +18,12 @@ class NetworkPrefix(DataTypeMeta):
         """."""
         return '%s(%s)' % (self.__class__.__name__, self.prefix)
 
-    def update_from_fields(self, fields):
-        """."""
-        if not fields:
-            return self
+    def update_from_reference_fields(self, reference, derefed_value):
+        """Do nothing when this callback is executed.
 
-        raise ZGSanityCheckFailed(
-            message='Network prefix data type does not accept extra fields',
-            context={'received_fields': fields}
-        )
+        Network prefix data type does not have any fields that may be
+        references thus does not need to handle any extra reference fields.
+        """
 
     @classmethod
     def from_dict(cls, data, referencer):
