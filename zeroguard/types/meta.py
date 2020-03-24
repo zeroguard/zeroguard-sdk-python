@@ -40,7 +40,7 @@ class DataTypeMeta(ABC):
         return object.__getattribute__(self, name)
 
     @abstractmethod
-    def __str__(self):
+    def __str__(self, as_list=False):
         """."""
 
     @property

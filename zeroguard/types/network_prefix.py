@@ -44,11 +44,11 @@ class NetworkPrefix(DataTypeMeta):
                 fields={'data': data}
             ))
 
-        if data_type != NetworkPrefix.TYPE:
+        if data_type != cls.TYPE:
             raise ValueError(format_logmsg(
                 errmsg,
                 error=Exception('Wrong data type in data'),
                 fields={'data': data}
             ))
 
-        return NetworkPrefix(prefix, referencer=referencer)
+        return cls(prefix, referencer=referencer)

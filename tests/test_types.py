@@ -42,11 +42,18 @@ def test_ipv4_address_init_ok(data):
 
     # This should raise because referencer does not contain any references
     with pytest.raises(ZGClientError):
-        print(ipaddr.closest_prefix)
+        # pylint: disable=W0104
+        ipaddr.closest_prefix
 
     # Now when the reference is in place it should work fine
-    referencer[1] = NetworkPrefix('0.0.0.0/0')
-    print(ipaddr.closest_prefix)
+    referencer[1] = NetworkPrefix('8.8.0.0/16')
+    assert ipaddr.closest_prefix == referencer[1]
+
+    referencer[2] = NetworkPrefix('0.0.0.0/0')
+    assert ipaddr.prefixes == [referencer[1], referencer[2]]
+
+    print()
+    print(ipaddr)
 
 
 @pytest.mark.parametrize('data', [
