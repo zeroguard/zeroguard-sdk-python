@@ -43,6 +43,23 @@ def cast_value(value, *cast_functions):
     return casted_value
 
 
+def to_unicode(obj, charset='utf-8', errors='strict'):
+    """Convert a given object to unicode.
+
+    This function is borrowed from validators library:
+    https://github.com/kvesteri/validators/blob/master/validators/domain.py#L21
+
+    :raises: UnicodeError
+    """
+    if obj is None:
+        return None
+
+    if not isinstance(obj, bytes):
+        return str(obj)
+
+    return obj.decode(charset, errors)
+
+
 def validate(value, validators, convert=True, expected_type=None):
     """."""
     verb_expected_type = str(expected_type) if expected_type else 'not_spec'

@@ -9,7 +9,6 @@ from zeroguard.errors.client import ZGClientError
 from zeroguard.types import IPv4Address, NetworkPrefix
 
 
-@pytest.mark.testit
 @pytest.mark.parametrize('data', [
     {
         "type": "ipv4",
