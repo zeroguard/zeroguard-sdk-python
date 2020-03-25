@@ -14,9 +14,17 @@ class NetworkPrefix(DataTypeMeta):
         self.prefix = check_valid_network_prefix(prefix)
         super().__init__(**kwargs)
 
-    def __str__(self):
+    def __str__(self, as_list=False):
         """."""
-        return '%s(%s)' % (self.__class__.__name__, self.prefix)
+        data = '%s(%s)' % (self.__class__.__name__, self.prefix)
+        return [data] if as_list else data
+
+    def to_dict(self):
+        """."""
+        return {
+            'type': self.TYPE,
+            'prefix': str(self.prefix)
+        }
 
     def update_from_reference_fields(self, reference, derefed_value):
         """Do nothing when this callback is executed.

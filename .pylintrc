@@ -1,2 +1,8 @@
+[BASIC]
+# Some of the arguments are perfectly fine being 2 characters long without
+# being confusing. These are added to a pattern that matches "good" argument
+# names below.
+argument-rgx=(dt|[a-z_][a-z0-9_]{2,30})$
+
 [MESSAGES CONTROL]
-disable=too-few-public-methods
+disable=too-few-public-methods,too-many-arguments

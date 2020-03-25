@@ -39,10 +39,6 @@ class DataTypeMeta(ABC):
         # Return an attribute that was just dereferenced
         return object.__getattribute__(self, name)
 
-    @abstractmethod
-    def __str__(self, as_list=False):
-        """."""
-
     @property
     def type(self):
         """Get a type of this data type."""
@@ -53,6 +49,18 @@ class DataTypeMeta(ABC):
             )
 
         return self.TYPE
+
+    # FIXME: This is not tested and should be considered highly experimental
+    def dereference_all(self, recursive=False):
+        """."""
+        for name in dir(self):
+            if name.startswith('_'):
+                continue
+
+            value = getattr(self, name)
+
+            if recursive and isinstance(value, DataTypeMeta):
+                value.dereference_all()
 
     def dereference(self, attribute_name):
         """."""
@@ -132,11 +140,8 @@ class DataTypeMeta(ABC):
         return value
 
     @abstractmethod
-    def update_from_reference_fields(self, reference, derefed_value):
-        """.
-
-        :raises: zeroguard.errors.client.ZGClientError child
-        """
+    def __str__(self, as_list=False):
+        """."""
 
     @classmethod
     @abstractmethod
@@ -149,6 +154,21 @@ class DataTypeMeta(ABC):
 
         :type data:       dict
         :type referencer: zeroguard.referencer.ReferencerMeta child
+        """
+
+    @abstractmethod
+    def to_dict(self):
+        """Return this object instance as a dictionary.
+
+        The dictionary returned should be JSON marshallable without any
+        additional transformations needed.
+        """
+
+    @abstractmethod
+    def update_from_reference_fields(self, reference, derefed_value):
+        """.
+
+        :raises: zeroguard.errors.client.ZGClientError child
         """
 
 

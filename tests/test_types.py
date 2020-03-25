@@ -1,5 +1,6 @@
 """Test zeroguard.types package."""
 from ipaddress import IPv4Network, IPv6Network
+import json
 
 import pytest
 
@@ -52,8 +53,20 @@ def test_ipv4_address_init_ok(data):
     referencer[2] = NetworkPrefix('0.0.0.0/0')
     assert ipaddr.prefixes == [referencer[1], referencer[2]]
 
-    print()
-    print(ipaddr)
+    # FIXME: This is a lazy check just to make sure it is not crashing. Down
+    # the road though we'd have to actually check the output.
+    str(ipaddr)
+
+    # NOTE: Make sure all objects are JSON serializable
+    ipaddr_dict = ipaddr.to_dict()
+    json.dumps(ipaddr_dict)
+
+    # Poor man's check of the output. Better than nothing.
+    want_dict = data
+    want_dict['closest_prefix'] = ipaddr.closest_prefix.to_dict()
+    want_dict['prefixes'] = [p.to_dict() for p in ipaddr.prefixes]
+
+    assert ipaddr_dict == want_dict
 
 
 @pytest.mark.parametrize('data', [
@@ -67,6 +80,7 @@ def test_network_prefix_init_ok(data):
 
     assert isinstance(netpref.prefix, (IPv4Network, IPv6Network))
     assert str(netpref.prefix) == data['prefix']
+    assert netpref.to_dict() == data
 
     assert str(netpref) == '%s(%s)' % (
         netpref.__class__.__name__,
@@ -87,5 +101,4 @@ def test_network_prefix_init_ok(data):
 def test_network_prefix_init_fail(data):
     """Test zeroguard.types.network_prefix.NetworkPrefix type."""
     with pytest.raises(ValueError):
-        print(data)
         NetworkPrefix.from_dict(data, {})

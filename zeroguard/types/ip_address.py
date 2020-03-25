@@ -1,5 +1,6 @@
 """IP address data types and helper classes."""
 import ipaddress
+import time
 
 from zeroguard.utils.fmt import lpad
 from zeroguard.utils.log import format_logmsg
@@ -30,6 +31,19 @@ class IPReputationEntry:
         ]
 
         return data if as_list else '\n'.join(data)
+
+    def to_dict(self):
+        """."""
+        def dt2unix(dt):
+            """."""
+            return int(time.mktime(dt.timetuple()))
+
+        return {
+            'name': self.name,
+            'current': self.current,
+            'first_seen': dt2unix(self.first_seen),
+            'last_seen': dt2unix(self.last_seen)
+        }
 
     @classmethod
     def from_dict(cls, data):
@@ -104,6 +118,16 @@ class IPv4Address(DataTypeMeta):
         ]
 
         return data if as_list else '\n'.join(data)
+
+    def to_dict(self):
+        """."""
+        return {
+            'type': self.TYPE,
+            'address': str(self.address),
+            'closest_prefix': self.closest_prefix.to_dict(),
+            'prefixes': [p.to_dict() for p in self.prefixes],
+            'reputation': [r.to_dict() for r in self.reputation]
+        }
 
     def update_from_reference_fields(self, reference, derefed_value):
         """Do nothing when this callback is executed.
@@ -227,6 +251,16 @@ class IPv6Address(DataTypeMeta):
         ]
 
         return data if as_list else '\n'.join(data)
+
+    def to_dict(self):
+        """."""
+        return {
+            'type': self.TYPE,
+            'address': str(self.address),
+            'closest_prefix': self.closest_prefix.to_dict(),
+            'prefixes': [p.to_dict() for p in self.prefixes],
+            'reputation': [r.to_dict() for r in self.reputation]
+        }
 
     def update_from_reference_fields(self, reference, derefed_value):
         """Do nothing when this callback is executed.
