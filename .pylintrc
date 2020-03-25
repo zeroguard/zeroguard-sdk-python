@@ -5,4 +5,4 @@
 argument-rgx=(dt|[a-z_][a-z0-9_]{2,30})$
 
 [MESSAGES CONTROL]
-disable=too-few-public-methods,too-many-arguments
+disable=too-few-public-methods,too-many-arguments,too-many-instance-attributes

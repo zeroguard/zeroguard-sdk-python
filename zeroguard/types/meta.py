@@ -6,6 +6,18 @@ from zeroguard.errors.client import ZGClientError, ZGSanityCheckFailed
 from zeroguard.utils.log import format_logmsg, get_labeled_logger
 
 
+class NotResolved:
+    """Sentinel class that signifies that the value is not yet resolved.
+
+    This is directly connected to a concept of 'slave' and 'master' attributes.
+    Read more in DataTypeMeta._trigger_deref_and_return method docstring.
+    """
+
+    def __repr__(self):
+        """."""
+        return 'NotResolved'
+
+
 class DataTypeMeta(ABC):
     """."""
 
@@ -33,11 +45,9 @@ class DataTypeMeta(ABC):
         except KeyError:
             pass
 
-        # This will raise if dereferencing failed
-        self.dereference(name)
-
-        # Return an attribute that was just dereferenced
-        return object.__getattribute__(self, name)
+        # Return an attribute that was just dereferenced. This will raise if
+        # dereferencing failed.
+        return self.dereference(name)
 
     @property
     def type(self):
@@ -70,6 +80,7 @@ class DataTypeMeta(ABC):
 
         self._deref_map[attribute_name] = True
         setattr(self, attribute_name, attribute_value)
+        return object.__getattribute__(self, attribute_name)
 
     def _dereference(self, value):
         """.
@@ -137,6 +148,54 @@ class DataTypeMeta(ABC):
 
         # Value is a nested data type instance which will be lazily derefernced
         # as soon as accessed or other non-reference value.
+        return value
+
+    def _trigger_deref_and_return(
+            self,
+            slave_attr_name,
+            master_attr_name,
+            default=NotResolved
+    ):
+        """Return an attribute value after dereferencing a master attribute.
+
+        Slave attribute is an attribute which value cannot be calculated and
+        set untill a "master" attribute will be succesfully dereferenced. This
+        function provides a wrapper for doing exactly that.
+
+        FIXME: Inner workings are not well documented. In fact, they are not
+        documented at all. TL;DR version is that when master will be
+        dereferenced a callback will be executed (update_from_reference_fields)
+        which should resolve a slave and set it to an actual value.
+        """
+        # Check whether slave is already set
+        value = getattr(self, slave_attr_name)
+
+        # Already resolved
+        if value != NotResolved:
+            return value
+
+        # Not yet resolved, need to dereference a master first
+        self.dereference(master_attr_name)
+
+        # Check whether dereferencing master actually set the slave
+        value = getattr(self, slave_attr_name)
+
+        # This is bad as resolving master failed to resolve a slave
+        if value == NotResolved:
+            if default != NotResolved:
+                setattr(self, slave_attr_name, default)
+                return default
+
+            raise ZGSanityCheckFailed(
+                message='Resolving master attribute did not resolved a slave',
+                context={
+                    'master_attribute_name': master_attr_name,
+                    'slave_attribute_name': slave_attr_name,
+                    'slave_attribute_value': value
+                }
+            )
+
+        # All good
         return value
 
     @abstractmethod
