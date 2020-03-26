@@ -1,0 +1,69 @@
+[
+    [
+        {
+            "type": "subdomain",
+            "name": "foo.example.com",
+            "ipv4": [
+                {
+                    "_ref": 1,
+                    "latest": true
+                },
+                {
+                    "_ref": 4,
+                    "oldest": true
+                }
+            ],
+            "ipv6": [
+                {
+                    "_ref": 5,
+                    "live": true
+                }
+            ]
+        },
+        {
+            "1": {
+                "type": "ipv4",
+                "address": "8.8.8.8",
+                "closest_prefix": {"_ref": 2},
+                "prefixes": [
+                    {"_ref": 2},
+                    {"_ref": 3}
+                ]
+            },
+            "2": {
+                "type": "netpref",
+                "prefix": "8.8.0.0/16"
+            },
+            "3": {
+                "type": "netpref",
+                "prefix": "0.0.0.0/0"
+            },
+            "4": {
+                "type": "ipv4",
+                "address": "8.8.4.4",
+                "closest_prefix": {"_ref": 2},
+                "prefixes": [
+                    {"_ref": 2},
+                    {"_ref": 3}
+                ]
+            },
+            "5": {
+                "type": "ipv6",
+                "address": "2001:4860:4860::8888",
+                "closest_prefix": {"_ref": 6},
+                "prefixes": [
+                    {"_ref": 6},
+                    {"_ref": 7}
+                ]
+            },
+            "6": {
+                "type": "netpref",
+                "prefix": "2001:4860::/32"
+            },
+            "7": {
+                "type": "netpref",
+                "prefix": "0::/0"
+            }
+        }
+    ]
+]

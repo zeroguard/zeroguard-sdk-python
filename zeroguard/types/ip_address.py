@@ -150,7 +150,7 @@ class IPv4Address(DataTypeMeta):
             # Create instances of IP reputation entries
             reputation = [
                 IPReputationEntry.from_dict(d)
-                for d in data['reputation']
+                for d in data.get('reputation', [])
             ]
 
             closest_prefix_ref = data['closest_prefix']['_ref']
@@ -283,7 +283,7 @@ class IPv6Address(DataTypeMeta):
             # Create instances of IP reputation entries
             reputation = [
                 IPReputationEntry.from_dict(d)
-                for d in data['reputation']
+                for d in data.get('reputation', [])
             ]
 
             closest_prefix_ref = data['closest_prefix']['_ref']

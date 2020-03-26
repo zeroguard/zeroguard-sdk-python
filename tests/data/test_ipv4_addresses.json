@@ -1,0 +1,38 @@
+[
+    [
+        {
+            "type": "ipv4",
+            "address": "8.8.8.8",
+            "closest_prefix": {"_ref": 1},
+            "prefixes": [
+                {"_ref": 1},
+                {"_ref": 2}
+            ],
+            "reputation": [
+                {
+                    "name": "firehol-coinbl-hosts",
+                    "current": false,
+                    "first_seen": 1584712048,
+                    "last_seen": 1584720037
+
+                },
+                {
+                    "name": "firehol-dshield-top-1000",
+                    "current": true,
+                    "first_seen": 1584714021,
+                    "last_seen": 1584720037
+                }
+            ]
+        },
+        {
+            "1": {
+                "type": "netpref",
+                "prefix": "8.8.0.0/16"
+            },
+            "2": {
+                "type": "netpref",
+                "prefix": "0.0.0.0/0"
+            }
+        }
+    ]
+]

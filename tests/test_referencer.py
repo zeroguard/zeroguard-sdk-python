@@ -1,12 +1,47 @@
 """Test zeroguard.referencer module."""
+from uuid import uuid4
+
 import pytest
 
 # pylint: disable=E0401
 from zeroguard.errors.client import ZGSanityCheckFailed
 from zeroguard.referencer import DictReferencer
+from zeroguard.types.meta import DataTypeMeta
 
 
-def test_dict_referencer(mock_data_type_instances):
+# pylint: disable=R0903
+class MockDataType(DataTypeMeta):
+    """Mock data type to use for testing.
+
+    It does not contain any data and only pretends to implement abstract
+    methods of DataTypeMeta. It is used only to pass referencer instance
+    type checks.
+    """
+
+    TYPE = 'mock'
+
+    def __init__(self, **kwargs):
+        """."""
+        self.mock_id = uuid4()
+        super().__init__(**kwargs)
+
+    def __str__(self):
+        """Mock."""
+        return 'Mock data type instance: %s' % self.mock_id
+
+    def to_dict(self):
+        """Mock."""
+
+    def update_from_reference_fields(self, reference, derefed_value):
+        """Mock."""
+
+    @classmethod
+    def from_dict(cls, _):
+        """Mock."""
+        return cls()
+
+
+def test_dict_referencer():
     """Test zeroguard.referencer.DictReferencer."""
     referencer = DictReferencer()
 
@@ -21,6 +56,9 @@ def test_dict_referencer(mock_data_type_instances):
         referencer[0] = 42
         referencer[1] = 'foo'
         referencer[2] = object()
+
+    # Generate 10 mock data type instances
+    mock_data_type_instances = [MockDataType()] * 10
 
     # Mock data type instances should be inserted correctly
     for index, instance in enumerate(mock_data_type_instances):
